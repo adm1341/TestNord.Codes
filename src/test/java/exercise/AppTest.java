@@ -90,11 +90,6 @@ public class AppTest {
 
 
 
-
-
-
-
-
     @Test
     void testUnauthenticatedRootPage() throws Exception {
         MockHttpServletResponse response = mockMvc
@@ -103,29 +98,6 @@ public class AppTest {
                 .getResponse();
 
         assertThat(response.getStatus()).isEqualTo(200);
-    }
-
-    @Test
-    void testUnauthenticated() throws Exception {
-        MockHttpServletResponse response = mockMvc
-                .perform(get("/users"))
-                .andReturn()
-                .getResponse();
-
-        assertThat(response.getStatus()).isEqualTo(401);
-    }
-
-    @Test
-    void testGetPostWithIncorrectPassword() throws Exception {
-        MockHttpServletResponse response = mockMvc
-                .perform(
-                        get("/users")
-                                .header("Authorization", "Basic UGV0cjoxMjM0N")
-                )
-                .andReturn()
-                .getResponse();
-
-        assertThat(response.getStatus()).isEqualTo(401);
     }
 
     @Test
@@ -167,34 +139,6 @@ public class AppTest {
     }
 
     // Проверяем полномочия пользователя
-
-    // Проверяем, что пользователь с ролью USER может видеть список пользователей
-    // и просматривать конкретного пользователя
-    @Test
-    void testUserCanShowUsers() throws Exception {
-        MockHttpServletResponse response1 = mockMvc
-                .perform(
-                        get("/users")
-                                .header("Authorization", "Basic YWxleGlzQGdtYWlsLmNvbToxMjM0NQ==")
-                )
-                .andReturn()
-                .getResponse();
-
-        assertThat(response1.getStatus()).isEqualTo(200);
-        assertThat(response1.getContentAsString()).contains("Alexis", "alexis@gmail.com");
-        assertThat(response1.getContentAsString()).contains("Admin", "admin@gmail.com");
-
-        MockHttpServletResponse response2 = mockMvc
-                .perform(
-                        get("/users/1")
-                                .header("Authorization", "Basic YWxleGlzQGdtYWlsLmNvbToxMjM0NQ==")
-                )
-                .andReturn()
-                .getResponse();
-
-        assertThat(response2.getStatus()).isEqualTo(200);
-        assertThat(response2.getContentAsString()).contains("Alexis", "alexis@gmail.com");
-    }
 
     // Проверяем, что пользователь ролью USER не может удалять пользователей
     @Test
