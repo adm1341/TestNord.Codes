@@ -6,6 +6,7 @@ import exercise.model.User;
 import exercise.model.UserRole;
 import exercise.repository.URLRepository;
 import exercise.repository.UserRepository;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -14,6 +15,8 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.net.URL;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -87,7 +90,58 @@ public class AppTest {
     }
 
 
+    @Test
+    void testGetUrlToShort() throws Exception {
+        MockHttpServletResponse response1 = mockMvc
+                .perform(
+                        get("/short/7zf2mt7")
+                )
+                .andReturn()
+                .getResponse();
 
+        assertThat(response1.getStatus()).isEqualTo(200);
+        assertThat(response1.getContentAsString()).contains("docs.spring.io");
+    }
+
+    @Test
+    void testNotFoundShort() throws Exception {
+        MockHttpServletResponse response = mockMvc
+                .perform(
+                        get("/short/1zf2mt1")
+                )
+                .andReturn()
+                .getResponse();
+        assertThat(response.getStatus()).isEqualTo(404);
+    }
+
+    @Test
+    void testCreateShortURL() throws Exception {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        URL url = new URL("https://www.baeldung.com/java-check-url-exists");
+        String content = objectMapper.writeValueAsString(url);
+
+        MockHttpServletResponse responsePost = mockMvc
+                .perform(
+                        post("/short/")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(content)
+                )
+                .andReturn()
+                .getResponse();
+
+        assertThat(responsePost.getStatus()).isEqualTo(200);
+
+        String urlResponse = responsePost.getContentAsString();
+
+        urlResponse = urlResponse.replaceAll("\"", "");
+
+        exercise.model.URL actualurl = urlRepository.findByShortUrl(urlResponse.substring(urlResponse.length() - 7)).get();
+        assertThat(actualurl).isNotNull();
+        assertThat(actualurl.getFullUrl()).isEqualTo(url.toString());
+
+    }
 
 
     @Test
