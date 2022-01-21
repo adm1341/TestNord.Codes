@@ -11,4 +11,9 @@ End points <br>
  GET: /{shortUrl}/info - Доступна только Администраторам. Возвращает представление объекта в котором есть количество переходов <br>
  DELETE: /{shortUrl} - Доступна только Администраторам. Удаляет короткую ссылку.<br>
 
-Это приложение на heroku https://secure-citadel-21955.herokuapp.com/
+Это приложение на heroku https://secure-citadel-21955.herokuapp.com/ <br>
+<br>Технологии: <br>
+- Spring Boot<br>
+- Spring Security<br>
+- Spring Data JPA<br>
+- Liquibase<br>
