@@ -21,7 +21,8 @@ public class URLController {
     @GetMapping(path = "/{shortUrl}")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Длинная ссылка"),
-            @ApiResponse(responseCode = "404", description = "Короткая ссылка не найдена")
+            @ApiResponse(responseCode = "404", description = "Короткая ссылка не найдена"),
+            @ApiResponse(responseCode = "410", description = "Короткая ссылка истекла")
     })
     public URL getFullUrlByShort(@PathVariable String shortUrl) {
         return urlService.getFullUrlByShort(shortUrl);
@@ -43,8 +44,11 @@ public class URLController {
             @ApiResponse(responseCode = "200", description = "Короткая ссылка")
     })
     @PostMapping(path = "/")
-    public URL createShortURL(@RequestBody URL url) {
-        return urlService.createShortURL(url);
+    public URL createShortURL(@RequestBody URL url, @RequestParam(required = false) Integer timeLive) {
+        if (timeLive == null) {
+            timeLive = 86400;
+        }
+        return urlService.createShortURL(url, timeLive);
     }
 
     @Operation(summary = "Удаление короткой ссылки.Требует роль ADMIN.")

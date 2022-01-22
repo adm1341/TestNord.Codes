@@ -143,6 +143,47 @@ public class AppTest {
 
     }
 
+    @Test
+    void testGoneShortURL() throws Exception {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        URL url = new URL("https://www.baeldung.com/java-check-url-exists");
+        String content = objectMapper.writeValueAsString(url);
+
+        MockHttpServletResponse responsePost = mockMvc
+                .perform(
+                        post("/short/?timeLive=-1")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(content)
+                )
+                .andReturn()
+                .getResponse();
+
+        assertThat(responsePost.getStatus()).isEqualTo(200);
+
+        String urlResponse = responsePost.getContentAsString();
+
+        urlResponse = urlResponse.replaceAll("\"", "");
+
+        String shortUrl = urlResponse.substring(urlResponse.length() - 7);
+
+        exercise.model.URL actualurl = urlRepository.findByShortUrl(shortUrl).get();
+        assertThat(actualurl).isNotNull();
+        assertThat(actualurl.getFullUrl()).isEqualTo(url.toString());
+
+
+
+        MockHttpServletResponse response1 = mockMvc
+                .perform(
+                        get("/short/"+shortUrl)
+                )
+                .andReturn()
+                .getResponse();
+
+        assertThat(response1.getStatus()).isEqualTo(410);
+
+    }
 
     @Test
     void testUnauthenticatedRootPage() throws Exception {
