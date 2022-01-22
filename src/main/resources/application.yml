@@ -23,3 +23,7 @@ spring:
       path: /h2console/
       settings:
         web-allow-others: true
+
+springdoc:
+  swagger-ui:
+    path: /swagger.html

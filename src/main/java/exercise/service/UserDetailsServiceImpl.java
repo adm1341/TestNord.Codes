@@ -1,4 +1,4 @@
-package exercise;
+package exercise.service;
 
 import exercise.model.User;
 import exercise.repository.UserRepository;

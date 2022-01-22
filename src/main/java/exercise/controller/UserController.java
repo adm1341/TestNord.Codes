@@ -3,7 +3,7 @@ package exercise.controller;
 import exercise.model.User;
 import exercise.repository.UserRepository;
 import exercise.model.UserRole;
-import exercise.UserNotFoundException;
+import exercise.exception.UserNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;

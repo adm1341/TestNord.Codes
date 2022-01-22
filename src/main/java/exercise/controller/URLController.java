@@ -1,12 +1,12 @@
 package exercise.controller;
 
-import exercise.URLNotFoundException;
-import exercise.repository.URLRepository;
-import org.apache.commons.lang3.RandomStringUtils;
+import exercise.service.URLServiceImpl;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 
 @RestController
@@ -14,63 +14,47 @@ import java.net.URL;
 public class URLController {
 
     @Autowired
-    private URLRepository urlRepository;
+    private URLServiceImpl urlService;
 
 
+    @Operation(summary = "Получение полной ссылки по короткой")
     @GetMapping(path = "/{shortUrl}")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Длинная ссылка"),
+            @ApiResponse(responseCode = "404", description = "Короткая ссылка не найдена")
+    })
     public URL getFullUrlByShort(@PathVariable String shortUrl) {
-
-        exercise.model.URL urlBase = urlRepository.findByShortUrl(shortUrl)
-                .orElseThrow(() -> new URLNotFoundException("URL not found"));
-
-        URL urlReturn = null;
-        try {
-            urlReturn = new URL(urlBase.getFullUrl());
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-
-        urlBase.setNumberClick(urlBase.getNumberClick() + 1);
-        urlRepository.save(urlBase);
-
-        return urlReturn;
-
+        return urlService.getFullUrlByShort(shortUrl);
     }
+
+    @Operation(summary = "Получение информации с количеством переходов.Требует роль ADMIN.")
     @GetMapping(path = "/{shortUrl}/info")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "JSON представление объекта"),
+            @ApiResponse(responseCode = "401", description = "Не авторизованный пользователь"),
+            @ApiResponse(responseCode = "404", description = "Короткая ссылка не найдена")
+    })
     public exercise.model.URL getInfoByShort(@PathVariable String shortUrl) {
-
-        exercise.model.URL urlBase = urlRepository.findByShortUrl(shortUrl)
-                .orElseThrow(() -> new URLNotFoundException("URL not found"));
-        return urlBase;
-
+        return urlService.getInfoByShort(shortUrl);
     }
 
+    @Operation(summary = "Получение короткой ссылки по полной ссылке.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Короткая ссылка")
+    })
     @PostMapping(path = "/")
     public URL createShortURL(@RequestBody URL url) {
-
-        exercise.model.URL urlBase = new exercise.model.URL();
-
-        urlBase.setFullUrl(String.valueOf(url));
-
-        String shortUrl = RandomStringUtils.randomAlphanumeric(7);
-        urlBase.setShortUrl(shortUrl);
-        urlBase.setNumberClick(0);
-
-        urlRepository.save(urlBase);
-        URL urlReturn = null;
-        try {
-            urlReturn = new URL("http://www.example.com/" + shortUrl);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-        return urlReturn;
+        return urlService.createShortURL(url);
     }
 
+    @Operation(summary = "Удаление короткой ссылки.Требует роль ADMIN.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Удаление прошло успешно"),
+            @ApiResponse(responseCode = "401", description = "Не авторизованный пользователь"),
+            @ApiResponse(responseCode = "404", description = "Короткая ссылка не найдена")
+    })
     @DeleteMapping(path = "/{shortUrl}")
     public void deleteShortURL(@PathVariable String shortUrl) {
-
-        exercise.model.URL urlBase = urlRepository.findByShortUrl(shortUrl)
-                .orElseThrow(() -> new URLNotFoundException("URL not found"));
-        urlRepository.delete(urlBase);
+        urlService.deleteShortURL(shortUrl);
     }
 }

@@ -14,7 +14,7 @@ import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.DELETE;
 
 import exercise.model.UserRole;
-import org.springframework.web.bind.annotation.GetMapping;
+import exercise.service.UserDetailsServiceImpl;
 
 @Configuration
 @EnableWebSecurity
