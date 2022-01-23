@@ -44,10 +44,7 @@ public class URLController {
             @ApiResponse(responseCode = "200", description = "Короткая ссылка")
     })
     @PostMapping(path = "/")
-    public URL createShortURL(@RequestBody URL url, @RequestParam(required = false) Integer timeLive) {
-        if (timeLive == null) {
-            timeLive = 86400;
-        }
+    public URL createShortURL(@RequestBody URL url, @RequestParam(defaultValue = "86400", required = false) Integer timeLive) {
         return urlService.createShortURL(url, timeLive);
     }
 
